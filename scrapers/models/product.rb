@@ -1,1 +1,1 @@
-Product = Struct.new(:id, :name, :variants, keyword_init: true)
+Product = Struct.new(:id, :name, :variants, :images, keyword_init: true)

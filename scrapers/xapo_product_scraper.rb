@@ -30,10 +30,14 @@ class XapoProductScraper
     end
 
     product_attrs = eval(product_text.captures.first.tr("\n ", '').prepend('{').concat('}'))
+    product_id = product_attrs[:id].to_s
+    images = doc.css("[data-store='product-image-#{product_id}'] a.js-product-thumb img.lazyload").map { |img| img.attr('data-srcset').split(',').map { _1.strip } }
+
     Product.new({
-      id: product_attrs[:id].to_s,
+      id: product_id,
       name: replace_hex_chars(product_attrs[:name]),
       variants: variants,
+      images: images.map { pick_best_image(_1) },
     })
   end
 
@@ -42,5 +46,11 @@ class XapoProductScraper
   # "\x20\x2D" -> " -"
   def replace_hex_chars(name)
     name.gsub(/\\x(.{2})/) { [Regexp.last_match[1]].pack('H*') }
+  end
+
+  def pick_best_image(images)
+    images.sort_by do |image_url|
+      /^.*\ (\d+)w$/.match(image_url).captures.first.to_i
+    end.reverse.first.split.first.prepend('https:')
   end
 end
