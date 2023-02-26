@@ -14,31 +14,28 @@ class XapoProductScraper
   end
 
   def scrape
-    doc = Nokogiri::HTML(URI.open(product_url, 'User-Agent' => USER_AGENT))
+    uri = URI.open(product_url, 'User-Agent' => USER_AGENT)
+    doc = Nokogiri::HTML(uri.read)
+    json_text = /<script>dataLayer = (.*?)<\/script>.*/.match(doc.to_s)
+    json = JSON.parse(json_text.captures.first)[0]
 
-    variants_text = /LS\.variants\ =\ \[(.*?)\];.*/.match(doc.text)
-    product_text = /LS\.product\ =\ {(.*?)};.*/m.match(doc.text)
+    product_id = json['idProduct']
+    product_name = doc.css('h1.product-name').text.strip
 
-    variants_attrs = eval(variants_text.captures.first.tr("\n ", '').gsub('null', 'nil').prepend('[').concat(']'))
-    variants = variants_attrs.map do |variant_attrs|
+    json_variants = json['listSku']
+    variants = json_variants.map do |json_variant|
       Variant.new({
-        id: variant_attrs[:id].to_s,
-        price: variant_attrs[:price_number],
-        option: variant_attrs[:option0],
-        image_url: variant_attrs[:image_url].prepend('https:'),
+        id: json_variant['idSku'],
+        price: json_variant['price'].to_f,
+        option: /Tamanho:\ (.*)/.match(json_variant['nameSku']).captures.first,
       })
     end
-
-    product_attrs = eval(product_text.captures.first.tr("\n ", '').prepend('{').concat('}'))
-    product_id = product_attrs[:id].to_s
-    product_name = doc.css("[data-store='product-name-#{product_id}']").text.strip
-    images = doc.css("[data-store='product-image-#{product_id}'] a.js-product-thumb img.lazyload").map { |img| img.attr('data-srcset').split(',').map { _1.strip } }
 
     Product.new({
       id: product_id,
       name: product_name,
       variants: variants,
-      images: images.map { pick_best_image(_1) },
+      images: doc.css('#product-wrapper img.swiper-lazy').map { _1.attr('data-src') }
     })
   end
 

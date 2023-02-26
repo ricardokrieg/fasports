@@ -3,33 +3,54 @@ require './scrapers/models/variant'
 require './scrapers/models/product'
 
 RSpec.describe XapoProductScraper do
-  subject { XapoProductScraper.new('https://xapostore.com.br/produtos/pronta-entrega-messi-10-2014-15/') }
+  subject { XapoProductScraper.new('https://www.xapostore.com.br/masculinas/versao-torcedor/selecoes/escocia-aniversario-150-anos') }
 
   describe 'scrape', vcr: 'xapo_product' do
     it 'returns the scraped product' do
       product = Product.new({
-        id: '155459462',
-        name: '[PRONTA ENTREGA] Messi #10 - (2014/15)',
+        id: '1125',
+        name: 'Escócia - Aniversário 150 anos',
         variants: [
           Variant.new({
-            id: '588772731',
-            price: 209.9,
-            option: 'M',
-            image_url: "https://d3ugyf2ht6aenh.cloudfront.net/stores/001/482/519/products/037a0752-608b-4e83-9e26-b45e2497b3b31-1feee904b19b4128a816752848908120-1024-1024.webp",
+            id: '1125-5659',
+            price: 159.9,
+            option: 'P',
+            image_url: nil,
           }),
           Variant.new({
-            id: '588772732',
-            price: 209.9,
+            id: '1125-5661',
+            price: 159.9,
+            option: 'M',
+            image_url: nil,
+          }),
+          Variant.new({
+            id: '1125-5663',
+            price: 159.9,
             option: 'G',
-            image_url: "https://d3ugyf2ht6aenh.cloudfront.net/stores/001/482/519/products/037a0752-608b-4e83-9e26-b45e2497b3b31-1feee904b19b4128a816752848908120-1024-1024.webp",
+            image_url: nil,
+          }),
+          Variant.new({
+            id: '1125-5665',
+            price: 159.9,
+            option: 'GG',
+            image_url: nil,
+          }),
+          Variant.new({
+            id: '1125-5667',
+            price: 159.9,
+            option: '2GG',
+            image_url: nil,
           }),
         ],
         images: %w[
-          https://d3ugyf2ht6aenh.cloudfront.net/stores/001/482/519/products/037a0752-608b-4e83-9e26-b45e2497b3b31-1feee904b19b4128a816752848908120-640-0.webp
-          https://d3ugyf2ht6aenh.cloudfront.net/stores/001/482/519/products/c6dbc153-aa9a-45cf-8136-e237c711cc101-d4b1ac9c6af8fab42d16752848905615-640-0.webp
-          https://d3ugyf2ht6aenh.cloudfront.net/stores/001/482/519/products/d39afa24-b036-4c54-88b9-60d1011a20001-0b84cd916fe4fc135816752848900595-640-0.webp
-          https://d3ugyf2ht6aenh.cloudfront.net/stores/001/482/519/products/b53d152a-6344-4e38-975d-4cee93f717501-bc12a1954ac0b455e916752848907001-640-0.webp
-          https://d3ugyf2ht6aenh.cloudfront.net/stores/001/482/519/products/38fa1e7f-e8bb-4b06-b854-d95376390d741-72f2d48abf0b4188f716752848900831-640-0.webp
+          https://images.tcdn.com.br/img/img_prod/1183067/escocia_aniversario_150_anos_1125_1_e7d1cc07eb814b0769e10bf9262f906f.jpg
+          https://images.tcdn.com.br/img/img_prod/1183067/escocia_aniversario_150_anos_1125_2_a28fad708b19ce0891404638323b8ad8.jpeg
+          https://images.tcdn.com.br/img/img_prod/1183067/escocia_aniversario_150_anos_1125_3_8763301ec74caf1539c9663dc3903930.jpg
+          https://images.tcdn.com.br/img/img_prod/1183067/escocia_aniversario_150_anos_1125_4_dc0d2e204668ae75940745f9c07c585c.jpg
+          https://images.tcdn.com.br/img/img_prod/1183067/escocia_aniversario_150_anos_1125_5_156318da8f59b628eb59afe2d6efa94a.jpg
+          https://images.tcdn.com.br/img/img_prod/1183067/escocia_aniversario_150_anos_1125_6_5506e40d027718f9d91a8b2d66be9304.jpg
+          https://images.tcdn.com.br/img/img_prod/1183067/escocia_aniversario_150_anos_1125_7_be78cdcb00423b169f1931a7a9e99287.jpg
+          https://images.tcdn.com.br/img/img_prod/1183067/escocia_aniversario_150_anos_1125_8_9cb0d608dde5083624f35ec98cb8f2fd.jpg
         ]
       })
       expect(subject.scrape).to eq(product)
