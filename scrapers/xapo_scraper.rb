@@ -1,20 +1,40 @@
-require 'open-uri'
-require 'nokogiri'
-require 'ostruct'
+require 'csv'
 
-require_relative './models/variant'
-require_relative './models/product'
-
-USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
+require_relative './xapo_page_scraper'
+require_relative './xapo_multiple_products_scraper'
 
 class XapoScraper
-  private attr_reader :url
-
-  def initialize(url)
+  def initialize(url, config)
     @url = url
+    @config = config
   end
 
   def scrape
-    doc = Nokogiri::HTML(URI.open(product_url, 'User-Agent' => USER_AGENT))
+    page = config.initial_page
+    loop do
+      puts "Scraping page #{page}"
+      puts page_url(page)
+
+      page_result = XapoPageScraper.new(page_url(page)).scrape
+      puts "Page #{page} returned #{page_result.products.size} products"
+
+      products = XapoMultipleProductsScraper.new(page_result.products).scrape
+
+      CSV.open('test.csv', 'a') do |csv|
+        ShopifyExporter.new(products).export_to(csv)
+      end
+
+      break unless page_result.has_next
+
+      page += 1
+    end
+  end
+
+  private
+
+  attr_reader :url, :config
+
+  def page_url(page)
+    url.gsub('<PAGE>', page.to_s).gsub('<PER_PAGE>', config.per_page.to_s)
   end
 end

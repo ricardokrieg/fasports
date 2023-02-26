@@ -1,5 +1,6 @@
 require 'open-uri'
 require 'nokogiri'
+require 'json'
 
 require_relative './models/page_result'
 require_relative './models/page_result_product'
